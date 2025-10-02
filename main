@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Bisu!</title>
+    <style>
+        /* General Styles */
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Hide scrollbars */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Container for the content */
+        #content {
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Greeting and Instruction Styles */
+        #greeting, #instruction {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            color: #fff;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #instruction {
+            top: 60%;
+            font-size: 1.2em;
+            color: #f7a5b3;
+        }
+
+        /* Heart Capture Game Styles */
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: none; /* Hidden until the game starts */
+            cursor: crosshair;
+        }
+
+        .heart {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            transform: rotate(-45deg);
+            cursor: pointer;
+            filter: blur(0.5px);
+            opacity: 0.9;
+        }
+
+        .heart::before, .heart::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -50%;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: 50%;
+        }
+
+        #status {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            color: #f7a5b3;
+            z-index: 10;
+        }
+
+        #moving-to-next {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            color: #ffcc00;
+            z-index: 10;
+            display: none;
+        }
+
+        /* Final Message Styles */
+        #final-message {
+            display: none; /* Hidden until the game is won */
+            font-size: 4em;
+            color: #f7a5b3;
+            text-shadow: 0 0 10px #f7a5b3;
+            position: relative; /* To center the flower */
+            padding-bottom: 50px; /* Space for the flower */
+        }
+
+        #final-message span {
+            display: block;
+            opacity: 0;
+            animation: fadeInText 2s forwards;
+        }
+
+        #final-message .name {
+            font-size: 1.2em;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00;
+        }
+
+        /* Flower Animation (from the video) */
+        .flower-container {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .flower {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: rgba(0,0,0,0);
+            border-radius: 50%;
+            animation: flowerBloom 4s ease-out 2s forwards;
+            opacity: 0;
+        }
+
+        .petal {
+            position: absolute;
+            width: 60px;
+            height: 100px;
+            background: #fff;
+            border-radius: 50% 50% 0 0;
+            transform-origin: bottom center;
+        }
+
+        .p1 { transform: rotate(0deg); animation: p1Bloom 2s ease-out 4s forwards; }
+        .p2 { transform: rotate(72deg); animation: p2Bloom 2s ease-out 4s forwards; }
+        .p3 { transform: rotate(144deg); animation: p3Bloom 2s ease-out 4s forwards; }
+        .p4 { transform: rotate(216deg); animation: p4Bloom 2s ease-out 4s forwards; }
+        .p5 { transform: rotate(288deg); animation: p5Bloom 2s ease-out 4s forwards; }
+        
+        .stem {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 150px;
+            background: #228B22; /* Forest Green */
+            animation: stemGrow 3s ease-out forwards;
+        }
+
+        /* Keyframes */
+        @keyframes fadeInText {
+            to { opacity: 1; }
+        }
+
+        @keyframes stemGrow {
+            0% { height: 0; }
+            100% { height: 150px; }
+        }
+
+        @keyframes flowerBloom {
+            0% { opacity: 0; transform: scale(0.5) translateX(-50%); }
+            100% { opacity: 1; transform: scale(1) translateX(-50%); }
+        }
+        
+        /* Petal Animations - Simple for this example */
+        @keyframes p1Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(0deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+        @keyframes p2Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(72deg); } 100% { opacity: 1; transform: scale(1) rotate(72deg); } }
+        @keyframes p3Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(144deg); } 100% { opacity: 1; transform: scale(1) rotate(144deg); } }
+        @keyframes p4Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(216deg); } 100% { opacity: 1; transform: scale(1) rotate(216deg); } }
+        @keyframes p5Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(288deg); } 100% { opacity: 1; transform: scale(1) rotate(288deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="content">
+        <div id="greeting">Happy Birthday, Bisu!</div>
+        <div id="instruction">
+            Wishing you a day filled with love and joy! 🎂<br><br>
+            <button id="open-button">OPEN</button>
+        </div>
+
+        <div id="game-area">
+            <div id="status">Capture the hearts! You must capture 10 hearts to reach the next level. <br> Hearts captured: <span id="heart-count">0</span>/10</div>
+            <div id="moving-to-next"></div>
+        </div>
+
+        <div id="final-message">
+            <span>I LOVE U</span>
+            <span class="name">BISU</span>
+            <div class="flower-container">
+                <div class="stem"></div>
+                <div class="flower">
+                    <div class="petal p1"></div>
+                    <div class="petal p2"></div>
+                    <div class="petal p3"></div>
+                    <div class="petal p4"></div>
+                    <div class="petal p5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const openButton = document.getElementById('open-button');
+        const content = document.getElementById('content');
+        const greetingDiv = document.getElementById('greeting');
+        const instructionDiv = document.getElementById('instruction');
+        const gameArea = document.getElementById('game-area');
+        const heartCountSpan = document.getElementById('heart-count');
+        const statusDiv = document.getElementById('status');
+        const movingToNextDiv = document.getElementById('moving-to-next');
+        const finalMessageDiv = document.getElementById('final-message');
+        
+        let heartsCaptured = 0;
+        const heartsNeeded = 10;
+        let gameTimer;
+        let heartGenerationInterval;
+
+        // --- Game Logic ---
+
+        openButton.addEventListener('click', () => {
+            // Fade out initial message and button
+            greetingDiv.style.opacity = 0;
+            instructionDiv.style.opacity = 0;
+            
+            setTimeout(() => {
+                greetingDiv.style.display = 'none';
+                instructionDiv.style.display = 'none';
+                gameArea.style.display = 'block';
+                startGame();
+            }, 1000); // Wait for fade out
+        });
+
+        function startGame() {
+            // Start generating hearts
+            heartGenerationInterval = setInterval(generateHeart, 1000);
+            
+            // Set up heart capture logic
+            gameArea.addEventListener('click', captureHeart);
+        }
+
+        function generateHeart() {
+            if (heartsCaptured >= heartsNeeded) {
+                clearInterval(heartGenerationInterval);
+                return;
+            }
+            
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            // Random position within the game area (viewport)
+            const maxX = window.innerWidth - 30; // 30px is heart width
+            const maxY = window.innerHeight - 30; 
+            
+            heart.style.left = ${Math.random() * maxX}px;
+            heart.style.top = ${Math.random() * maxY}px;
+            
+            gameArea.appendChild(heart);
+
+            // Simple animation: heart disappears after a few seconds if not clicked
+            setTimeout(() => {
+                if (gameArea.contains(heart)) {
+                    heart.remove();
+                }
+            }, 3000); // Heart lasts for 3 seconds
+        }
+
+        function captureHeart(event) {
+            const clickedElement = event.target;
+            if (clickedElement.classList.contains('heart')) {
+                heartsCaptured++;
+                heartCountSpan.textContent = heartsCaptured;
+                clickedElement.remove(); // Remove the captured heart
+                
+                if (heartsCaptured >= heartsNeeded) {
+                    endGame();
+                }
+            }
+        }
+
+        function endGame() {
+            clearInterval(heartGenerationInterval);
+            gameArea.removeEventListener('click', captureHeart);
+            
+            // Display win message and countdown
+            statusDiv.style.display = 'none';
+            movingToNextDiv.innerHTML = Congratulations! 💖 Moving to the next level in <span>5</span> seconds...;
+            movingToNextDiv.style.display = 'block';
+            
+            let countdown = 4; // Start at 4 because 5 is already displayed
+            const countdownInterval = setInterval(() => {
+                if (countdown === 0) {
+                    clearInterval(countdownInterval);
+                    transitionToFinalMessage();
+                } else {
+                    movingToNextDiv.querySelector('span').textContent = countdown;
+                    countdown--;
+                }
+            }, 1000);
+        }
+
+        function transitionToFinalMessage() {
+            gameArea.style.display = 'none';
+            finalMessageDiv.style.display = 'flex';
+            finalMessageDiv.style.flexDirection = 'column';
+            finalMessageDiv.style.alignItems = 'center';
+            finalMessageDiv.style.justifyContent = 'center';
+
+            // Start the flower animation indirectly via CSS keyframes
+            // The text fade in is also handled by CSS keyframes
+        }
+
+        // Initialize heart generation when the document is fully loaded
+        // This ensures the initial hearts can be generated if the user clicks fast
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initial style adjustments
+             gameArea.style.display = 'none';
+        });
+
+    </script>
+</body>
+</html>
