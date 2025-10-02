@@ -1,450 +1,360 @@
-<html lang="en"><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/content/location/location.js" id="eppiocemhmnlbhjplcgkofciiegomcon"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/extend-native-history-api.js"></script><script src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/libs/requests.js"></script><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday My Gurl!</title>
+    <title>Happy Birthday, Bisu!</title>
     <style>
-        * {
+        /* General Styles */
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Hide scrollbars */
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
         }
 
-        .container {
-            text-align: center;
-            z-index: 10;
-            padding: 2rem;
-            max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3);
-            transition: all 0.5s ease;
-        }
-
-        .container:hover {
-            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
-        }
-
-        h1 {
-            font-size: 3.5rem;
-            color: #FF1493;
-            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.8);
-            margin-bottom: 1.5rem;
-            opacity: 0;
-            animation: bounce-in 1.5s forwards 0.5s;
-        }
-
-        .subtitle {
-            font-size: 1.8rem;
-            color: #8A2BE2;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.6);
-            opacity: 0;
-        }
-
-        .next-button {
-            padding: 1rem 3rem;
-            font-size: 1.5rem;
-            background: linear-gradient(45deg, #FF1493, #8A2BE2);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.5);
-            transition: all 0.3s ease;
-            opacity: 0;
-            animation: fade-in 1s forwards 3s;
-        }
-
-        .next-button:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.7);
-            background: linear-gradient(45deg, #8A2BE2, #FF1493);
-        }
-
-        .audio-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 10px;
-            border-radius: 50px;
+        /* Container for the content */
+        #content {
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            justify-content: center;
+            transition: opacity 1s ease-in-out;
         }
 
-        .audio-controls button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #FF1493;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .audio-controls button:hover {
-            transform: scale(1.2);
-            color: #8A2BE2;
-        }
-
-        .audio-controls input {
-            width: 100px;
-        }
-
-        .confetti, .balloon, .heart, .star {
+        /* Greeting and Instruction Styles */
+        #greeting, #instruction {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            z-index: 1;
-            opacity: 0.8;
-            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            color: #fff;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
         }
 
-        .balloon {
-            width: 40px;
-            height: 50px;
+        #instruction {
+            top: 60%;
+            font-size: 1.2em;
+            color: #f7a5b3;
+        }
+
+        /* Heart Capture Game Styles */
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: none; /* Hidden until the game starts */
+            cursor: crosshair;
         }
 
         .heart {
-            width: 25px;
-            height: 25px;
-        }
-
-        .star {
-            width: 15px;
-            height: 15px;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(10deg);
-            }
-            100% {
-                transform: translateY(0) rotate(0deg);
-            }
-        }
-
-        @keyframes sway {
-            0% {
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(20px);
-            }
-            100% {
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes sparkle {
-            0%, 100% {
-                opacity: 0.4;
-            }
-            50% {
-                opacity: 1;
-                filter: drop-shadow(0 0 5px white);
-            }
-        }
-
-        @keyframes bounce-in {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            60% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-            80% {
-                transform: scale(0.9);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fade-in {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes typewriter {
-            from {
-                width: 0;
-            }
-            to {
-                width: 100%;
-            }
-        }
-
-        .typewriter-container {
-            display: inline-block;
-            margin: 0 auto;
-            position: relative;
-            max-width: 100%;
-            overflow: hidden;
-            height: 2.5rem;
-        }
-
-        .typewriter-text {
-            position: relative;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 0;
-            animation: typewriter 3s steps(50) forwards 1.5s;
-        }
-
-        .cursor {
             position: absolute;
-            right: -5px;
-            width: 3px;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            transform: rotate(-45deg);
+            cursor: pointer;
+            filter: blur(0.5px);
+            opacity: 0.9;
+        }
+
+        .heart::before, .heart::after {
+            content: "";
+            position: absolute;
+            width: 100%;
             height: 100%;
-            background-color: #8A2BE2;
-            animation: blink 0.8s infinite;
+            background-color: red;
+            border-radius: 50%;
         }
 
-        @keyframes blink {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
+        .heart::before {
+            top: -50%;
+            left: 0;
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            .subtitle {
-                font-size: 1.3rem;
-            }
-            .container {
-                width: 90%;
-                padding: 1.5rem;
-            }
-            .next-button {
-                padding: 0.8rem 2rem;
-                font-size: 1.2rem;
-            }
-            .audio-controls {
-                bottom: 10px;
-                right: 10px;
-            }
+        .heart::after {
+            top: 0;
+            left: 50%;
         }
+
+        #status {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            color: #f7a5b3;
+            z-index: 10;
+        }
+
+        #moving-to-next {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            color: #ffcc00;
+            z-index: 10;
+            display: none;
+        }
+
+        /* Final Message Styles */
+        #final-message {
+            display: none; /* Hidden until the game is won */
+            font-size: 4em;
+            color: #f7a5b3;
+            text-shadow: 0 0 10px #f7a5b3;
+            position: relative; /* To center the flower */
+            padding-bottom: 50px; /* Space for the flower */
+        }
+
+        #final-message span {
+            display: block;
+            opacity: 0;
+            animation: fadeInText 2s forwards;
+        }
+
+        #final-message .name {
+            font-size: 1.2em;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00;
+        }
+
+        /* Flower Animation (from the video) */
+        .flower-container {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .flower {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: rgba(0,0,0,0);
+            border-radius: 50%;
+            animation: flowerBloom 4s ease-out 2s forwards;
+            opacity: 0;
+        }
+
+        .petal {
+            position: absolute;
+            width: 60px;
+            height: 100px;
+            background: #fff;
+            border-radius: 50% 50% 0 0;
+            transform-origin: bottom center;
+        }
+
+        .p1 { transform: rotate(0deg); animation: p1Bloom 2s ease-out 4s forwards; }
+        .p2 { transform: rotate(72deg); animation: p2Bloom 2s ease-out 4s forwards; }
+        .p3 { transform: rotate(144deg); animation: p3Bloom 2s ease-out 4s forwards; }
+        .p4 { transform: rotate(216deg); animation: p4Bloom 2s ease-out 4s forwards; }
+        .p5 { transform: rotate(288deg); animation: p5Bloom 2s ease-out 4s forwards; }
+        
+        .stem {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 150px;
+            background: #228B22; /* Forest Green */
+            animation: stemGrow 3s ease-out forwards;
+        }
+
+        /* Keyframes */
+        @keyframes fadeInText {
+            to { opacity: 1; }
+        }
+
+        @keyframes stemGrow {
+            0% { height: 0; }
+            100% { height: 150px; }
+        }
+
+        @keyframes flowerBloom {
+            0% { opacity: 0; transform: scale(0.5) translateX(-50%); }
+            100% { opacity: 1; transform: scale(1) translateX(-50%); }
+        }
+        
+        /* Petal Animations - Simple for this example */
+        @keyframes p1Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(0deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+        @keyframes p2Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(72deg); } 100% { opacity: 1; transform: scale(1) rotate(72deg); } }
+        @keyframes p3Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(144deg); } 100% { opacity: 1; transform: scale(1) rotate(144deg); } }
+        @keyframes p4Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(216deg); } 100% { opacity: 1; transform: scale(1) rotate(216deg); } }
+        @keyframes p5Bloom { 0% { opacity: 0; transform: scale(0.1) rotate(288deg); } 100% { opacity: 1; transform: scale(1) rotate(288deg); } }
     </style>
-<script bis_use="true" type="text/javascript" charset="utf-8" data-bis-config="[&quot;facebook.com/&quot;,&quot;twitter.com/&quot;,&quot;youtube-nocookie.com/embed/&quot;,&quot;//vk.com/&quot;,&quot;//www.vk.com/&quot;,&quot;linkedin.com/&quot;,&quot;//www.linkedin.com/&quot;,&quot;//instagram.com/&quot;,&quot;//www.instagram.com/&quot;,&quot;//www.google.com/recaptcha/api2/&quot;,&quot;//hangouts.google.com/webchat/&quot;,&quot;//www.google.com/calendar/&quot;,&quot;//www.google.com/maps/embed&quot;,&quot;spotify.com/&quot;,&quot;soundcloud.com/&quot;,&quot;//player.vimeo.com/&quot;,&quot;//disqus.com/&quot;,&quot;//tgwidget.com/&quot;,&quot;//js.driftt.com/&quot;,&quot;friends2follow.com&quot;,&quot;/widget&quot;,&quot;login&quot;,&quot;//video.bigmir.net/&quot;,&quot;blogger.com&quot;,&quot;//smartlock.google.com/&quot;,&quot;//keep.google.com/&quot;,&quot;/web.tolstoycomments.com/&quot;,&quot;moz-extension://&quot;,&quot;chrome-extension://&quot;,&quot;/auth/&quot;,&quot;//analytics.google.com/&quot;,&quot;adclarity.com&quot;,&quot;paddle.com/checkout&quot;,&quot;hcaptcha.com&quot;,&quot;recaptcha.net&quot;,&quot;2captcha.com&quot;,&quot;accounts.google.com&quot;,&quot;www.google.com/shopping/customerreviews&quot;,&quot;buy.tinypass.com&quot;,&quot;gstatic.com&quot;,&quot;secureir.ebaystatic.com&quot;,&quot;docs.google.com&quot;,&quot;contacts.google.com&quot;,&quot;github.com&quot;,&quot;mail.google.com&quot;,&quot;chat.google.com&quot;,&quot;audio.xpleer.com&quot;,&quot;keepa.com&quot;,&quot;static.xx.fbcdn.net&quot;,&quot;sas.selleramp.com&quot;,&quot;1plus1.video&quot;,&quot;console.googletagservices.com&quot;,&quot;//lnkd.demdex.net/&quot;,&quot;//radar.cedexis.com/&quot;,&quot;//li.protechts.net/&quot;,&quot;challenges.cloudflare.com/&quot;,&quot;ogs.google.com&quot;]" src="chrome-extension://eppiocemhmnlbhjplcgkofciiegomcon/executors/traffic.js"></script><style type="text/css">
-@font-face {
-	font-family: 'Atlassian Sans';
-	font-style: normal;
-	font-weight: 400 653;
-	font-display: swap;
-	src:
-		url('chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/fonts/AtlassianSans-latin.woff2') format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-		U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}</style></head>
-<body bis_register="W3sibWFzdGVyIjp0cnVlLCJleHRlbnNpb25JZCI6ImVwcGlvY2VtaG1ubGJoanBsY2drb2ZjaWllZ29tY29uIiwiYWRibG9ja2VyU3RhdHVzIjp7IkRJU1BMQVkiOiJkaXNhYmxlZCIsIkZBQ0VCT09LIjoiZGlzYWJsZWQiLCJUV0lUVEVSIjoiZGlzYWJsZWQiLCJSRURESVQiOiJkaXNhYmxlZCIsIlBJTlRFUkVTVCI6ImRpc2FibGVkIiwiSU5TVEFHUkFNIjoiZGlzYWJsZWQiLCJMSU5LRURJTiI6ImRpc2FibGVkIiwiQ09ORklHIjoiZGlzYWJsZWQifSwidmVyc2lvbiI6IjIuMC4yMiIsInNjb3JlIjoyMDAyMn1d" __processed_0f899d02-c977-4ac2-8af0-0af2181c0594__="true" data-new-gr-c-s-check-loaded="14.1235.0" data-gr-ext-installed="">
-    <div class="container" bis_skin_checked="1">
-        <h1 style="text-shadow: rgb(255, 255, 255) 0px 0px 10px, rgba(255, 255, 255, 0.8) 0px 0px 20px, rgba(255, 20, 147, 0.6) 0px 0px 30px;">Happy Birthday, </br>My Gurl! </br>🎉🎂</h1>
-        <div class="typewriter-container" bis_skin_checked="1">
-            <div class="subtitle typewriter-text" bis_skin_checked="1">
-                Hey Bestie! Ready for your special surprise? Click to continue!
-                <span class="cursor"></span>
+</head>
+<body>
+
+    <div id="content">
+        <div id="greeting">Happy Birthday, Bisu!</div>
+        <div id="instruction">
+            Wishing you a day filled with love and joy! 🎂<br><br>
+            <button id="open-button">OPEN</button>
+        </div>
+
+        <div id="game-area">
+            <div id="status">Capture the hearts! You must capture 10 hearts to reach the next level. <br> Hearts captured: <span id="heart-count">0</span>/10</div>
+            <div id="moving-to-next"></div>
+        </div>
+
+        <div id="final-message">
+            <span>I LOVE U</span>
+            <span class="name">BISU</span>
+            <div class="flower-container">
+                <div class="stem"></div>
+                <div class="flower">
+                    <div class="petal p1"></div>
+                    <div class="petal p2"></div>
+                    <div class="petal p3"></div>
+                    <div class="petal p4"></div>
+                    <div class="petal p5"></div>
+                </div>
             </div>
         </div>
-        <button class="next-button" onclick="goToNextPage()">Let's Go! ✨</button>
     </div>
 
-    <div class="audio-controls" bis_skin_checked="1">
-        <button id="play-pause"><i class="play-icon">▶️</i></button>
-        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
-    </div>
-
-    <audio id="birthday-song" loop="">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
-        Your browser does not support the audio element.
-    </audio>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <script>
-        // Play birthday song
-        const audio = document.getElementById('birthday-song');
-        const playPauseBtn = document.getElementById('play-pause');
-        const volumeControl = document.getElementById('volume');
-        let isPlaying = false;
+        const openButton = document.getElementById('open-button');
+        const content = document.getElementById('content');
+        const greetingDiv = document.getElementById('greeting');
+        const instructionDiv = document.getElementById('instruction');
+        const gameArea = document.getElementById('game-area');
+        const heartCountSpan = document.getElementById('heart-count');
+        const statusDiv = document.getElementById('status');
+        const movingToNextDiv = document.getElementById('moving-to-next');
+        const finalMessageDiv = document.getElementById('final-message');
+        
+        let heartsCaptured = 0;
+        const heartsNeeded = 10;
+        let gameTimer;
+        let heartGenerationInterval;
 
-        // Set initial volume
-        audio.volume = volumeControl.value;
+        // --- Game Logic ---
 
-        // Play audio when page loads but wait a bit
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                audio.play()
-                    .then(() => {
-                        isPlaying = true;
-                        playPauseBtn.innerHTML = '<i class="play-icon">⏸️</i>';
-                    })
-                    .catch(error => {
-                        console.log("Audio play failed due to autoplay restrictions:", error);
-                    });
-            }, 1000);
-        });
-
-        // Play/Pause button
-        playPauseBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                audio.pause();
-                playPauseBtn.innerHTML = '<i class="play-icon">▶️</i>';
-            } else {
-                audio.play();
-                playPauseBtn.innerHTML = '<i class="play-icon">⏸️</i>';
-            }
-            isPlaying = !isPlaying;
-        });
-
-        // Volume control
-        volumeControl.addEventListener('input', () => {
-            audio.volume = volumeControl.value;
-        });
-
-        // Function to go to next page
-        function goToNextPage() {
-            // Add a bounce effect before navigating
-            gsap.to('.next-button', {
-                scale: 1.2,
-                yoyo: true,
-                repeat: 1,
-                duration: 0.3,
-                onComplete: () => {
-                    // Change this URL to your next page
-                    window.location.href = "memorylane.html";
-                    
-                    // For demonstration, we'll just show an alert
-                    
-                }
-            });
-        }
-
-        // Create confetti, balloons, hearts, and stars
-        function createFloatingElements() {
-            const colors = ['#FF1493', '#8A2BE2', '#FFD700', '#FF4500', '#00BFFF', '#32CD32'];
-            const elements = ['confetti', 'balloon', 'heart', 'star'];
-            const confettiShapes = ['▲', '■', '●', '★', '♥', '♦', '✦', '✧'];
+        openButton.addEventListener('click', () => {
+            // Fade out initial message and button
+            greetingDiv.style.opacity = 0;
+            instructionDiv.style.opacity = 0;
             
-            for (let i = 0; i < 100; i++) {
-                setTimeout(() => {
-                    const element = document.createElement('div');
-                    
-                    // Randomly pick an element type
-                    const elementType = elements[Math.floor(Math.random() * elements.length)];
-                    element.className = elementType;
-                    
-                    // Set random position
-                    element.style.left = Math.random() * 100 + 'vw';
-                    element.style.top = -30 + 'px';
-                    
-                    // Set random color
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    
-                    // Different styling based on element type
-                    if (elementType === 'confetti') {
-                        const shape = confettiShapes[Math.floor(Math.random() * confettiShapes.length)];
-                        element.innerHTML = shape;
-                        element.style.color = color;
-                        element.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                        element.style.transform = `rotate(${Math.random() * 360}deg)`;
-                    } else if (elementType === 'balloon') {
-                        element.innerHTML = '🎈';
-                        element.style.fontSize = (Math.random() * 30 + 20) + 'px';
-                        element.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
-                    } else if (elementType === 'heart') {
-                        element.innerHTML = '❤️';
-                        element.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                        element.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
-                    } else if (elementType === 'star') {
-                        element.innerHTML = '✨';
-                        element.style.fontSize = (Math.random() * 15 + 10) + 'px';
-                    }
-                    
-                    // Add to body
-                    document.body.appendChild(element);
-                    
-                    // Animate with GSAP
-                    gsap.to(element, {
-                        y: window.innerHeight + 100,
-                        x: '+=' + (Math.random() * 200 - 100),
-                        rotation: Math.random() * 360,
-                        duration: Math.random() * 10 + 5,
-                        ease: "power1.out",
-                        onComplete: () => {
-                            document.body.removeChild(element);
-                        }
-                    });
-                    
-                    // Add some sparkle animation
-                    if (Math.random() > 0.7) {
-                        gsap.to(element, {
-                            opacity: 0.5,
-                            yoyo: true,
-                            repeat: -1,
-                            duration: 0.5,
-                            ease: "sine.inOut"
-                        });
-                    }
-                    
-                }, i * 200); // Staggered start times
+            setTimeout(() => {
+                greetingDiv.style.display = 'none';
+                instructionDiv.style.display = 'none';
+                gameArea.style.display = 'block';
+                startGame();
+            }, 1000); // Wait for fade out
+        });
+
+        function startGame() {
+            // Start generating hearts
+            heartGenerationInterval = setInterval(generateHeart, 1000);
+            
+            // Set up heart capture logic
+            gameArea.addEventListener('click', captureHeart);
+        }
+
+        function generateHeart() {
+            if (heartsCaptured >= heartsNeeded) {
+                clearInterval(heartGenerationInterval);
+                return;
+            }
+            
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            // Random position within the game area (viewport)
+            const maxX = window.innerWidth - 30; // 30px is heart width
+            const maxY = window.innerHeight - 30; 
+            
+            heart.style.left = ${Math.random() * maxX}px;
+            heart.style.top = ${Math.random() * maxY}px;
+            
+            gameArea.appendChild(heart);
+
+            // Simple animation: heart disappears after a few seconds if not clicked
+            setTimeout(() => {
+                if (gameArea.contains(heart)) {
+                    heart.remove();
+                }
+            }, 3000); // Heart lasts for 3 seconds
+        }
+
+        function captureHeart(event) {
+            const clickedElement = event.target;
+            if (clickedElement.classList.contains('heart')) {
+                heartsCaptured++;
+                heartCountSpan.textContent = heartsCaptured;
+                clickedElement.remove(); // Remove the captured heart
+                
+                if (heartsCaptured >= heartsNeeded) {
+                    endGame();
+                }
             }
         }
 
-        // Start floating elements on load
-        window.addEventListener('load', createFloatingElements);
-        
-        // Create new elements periodically
-        setInterval(createFloatingElements, 5000);
-        
-        // Add a subtle sparkle effect to the heading
-        gsap.to('h1', {
-            textShadow: "0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 20, 147, 0.6)",
-            repeat: -1,
-            yoyo: true,
-            duration: 2
-        });
-        
-        // Responsive adjustments
-        function handleResize() {
-            // Add responsive adjustments if needed
+        function endGame() {
+            clearInterval(heartGenerationInterval);
+            gameArea.removeEventListener('click', captureHeart);
+            
+            // Display win message and countdown
+            statusDiv.style.display = 'none';
+            movingToNextDiv.innerHTML = Congratulations! 💖 Moving to the next level in <span>5</span> seconds...;
+            movingToNextDiv.style.display = 'block';
+            
+            let countdown = 4; // Start at 4 because 5 is already displayed
+            const countdownInterval = setInterval(() => {
+                if (countdown === 0) {
+                    clearInterval(countdownInterval);
+                    transitionToFinalMessage();
+                } else {
+                    movingToNextDiv.querySelector('span').textContent = countdown;
+                    countdown--;
+                }
+            }, 1000);
         }
-        
-        window.addEventListener('resize', handleResize);
-        handleResize();
+
+        function transitionToFinalMessage() {
+            gameArea.style.display = 'none';
+            finalMessageDiv.style.display = 'flex';
+            finalMessageDiv.style.flexDirection = 'column';
+            finalMessageDiv.style.alignItems = 'center';
+            finalMessageDiv.style.justifyContent = 'center';
+
+            // Start the flower animation indirectly via CSS keyframes
+            // The text fade in is also handled by CSS keyframes
+        }
+
+        // Initialize heart generation when the document is fully loaded
+        // This ensures the initial hearts can be generated if the user clicks fast
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initial style adjustments
+             gameArea.style.display = 'none';
+        });
+
     </script>
-</body></html>
+</body>
+</html>
